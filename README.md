@@ -1,6 +1,6 @@
 ## Webpage 주소
 
-[부산지키미 홈페이지](www.busanjikimi.com)
+[부산지키미 홈페이지](https://www.busanjikimi.com)
 
 ## 코로나 확진자 동선 
 
