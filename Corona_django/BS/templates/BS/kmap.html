@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>여러개 마커에 이벤트 등록하기1</title>
+    <script src="/static/js/jquery3.js"></script>
+</head>
+<body>
+    <div class="ml-5 mb-3" style="margin: auto;">
+        <input type='text' id=addr style="width: auto;height:30px">
+        <button id=btn_addr style='width:50px; height:30px;'>검색</button>
+    </div>  
+<div id="map" style="width:95%;height:85%;margin:auto"></div>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a2a289736042220990f0ed44d148d194"></script>
+
+<script>
+    
+var mapContainer = document.getElementById('map'), // 지도를 표시할 div  
+    mapOption = { 
+        center: new kakao.maps.LatLng(35.1573107,129.0559681), // 지도의 중심좌표
+        level: 2 // 지도의 확대 레벨
+        
+    };
+
+var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+map.setMaxLevel(3);
+
+$('#addr').on('change', () => {
+    // alert($('#gu').val())
+    // 서버쪽으로 해당 행정구역 gps값 요청
+    // var addr = $('#addr').val()
+    pharmacy_data($('#addr').val());
+    // ps.keywordSearch(addr, placesSearchCB); 
+})
+$('#btn_addr').on('click', () => {
+    // alert($('#gu').val())
+    // 서버쪽으로 해당 행정구역 gps값 요청
+    // var addr = $('#addr').val()
+    pharmacy_data($('#addr').val());
+    // ps.keywordSearch(addr, placesSearchCB); 
+})
+function pharmacy_data(addr) {
+    // 서버쪽으로 해당 행정구역 gps값 요청 -> ajax
+    // ajax : 화면은 그대로두고, 백그라운드(비동기)에서 통신을 수행
+    // 서버요청
+    // js에서는 {}이 곧 객체
+    // 여기서 서버로 DB로 쿼리수행하면(fetchall) -> selectAreaGps로 받으면 그제서야 initAreaMap(gpses)로 가는 것
+    $.post({
+        // url: '/getAreaGps',
+        'url': 'pharmacy_data',
+        'data': 'addr=' + addr,
+        'dataType': 'json',
+        'success': (data) => {
+            let tmp=data
+            //placesSearchC(tmp)
+            // console.log({{data.0}})
+            //console.log(tmp)
+            phar_coordi(tmp.data)
+            //console.log(tmp.data[0]['lat'],tmp.data[0]['lng'])
+            console.log(tmp.data)
+            
+        },
+        'error': (err) => { console.log(123) }
+
+    })
+}
+// 마커를 표시할 위치와 내용을 가지고 있는 객체 배열입니다 
+//var positions = [
+//    {
+  //      content: '<div>카카오</div>', 
+    //    latlng: new kakao.maps.LatLng(33.450705, 126.570677)
+    //},
+function phar_coordi(positions){
+    for (var i = 0; i < positions.length; i ++) {
+        // 마커를 생성합니다
+        var latlng=new kakao.maps.LatLng(positions[i]['lat'],positions[i]['lng'])
+        //console.log(latlng)
+        var marker = new kakao.maps.Marker({
+            map: map, // 마커를 표시할 지도
+            position: latlng // 마커의 위치
+        });
+        map.setCenter(new kakao.maps.LatLng(positions[0]['set_lat'],positions[0]['set_lng']))
+        // 마커에 표시할 인포윈도우를 생성합니다 
+
+        var iwContent = '<div style="width:100%;height:150px;margin:auto;">'+'약국명 : '+positions[i]['name']+'<br>'
+                                                    +'주소 : '+positions[i]['addr']+'<br>'
+                                                    +'입고시간 : '+positions[i]['stock_at']+'<br>'
+                                                    +'재고상태 : '+positions[i]['remain_stat']+'<br>'
+                                                    +'데이터 생성 일자 : '+positions[i]['created_at']+'<br>'
+                        +'</div>', // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+        iwPosition = new kakao.maps.LatLng(positions[0]['lat'],positions[0]['lng']); //인포윈도우 표시 위치입니다
+
+        // 인포윈도우를 생성합니다
+        var infowindow = new kakao.maps.InfoWindow({
+            position : iwPosition, 
+            content : iwContent 
+        });
+
+        //var infowindow = new kakao.maps.InfoWindow({
+        //    content: positions[i]['name'] // 인포윈도우에 표시할 내용
+        //});
+
+        // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다
+        // 이벤트 리스너로는 클로저를 만들어 등록합니다 
+        // for문에서 클로저를 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
+        kakao.maps.event.addListener(marker, 'mouseover', makeOverListener(map, marker, infowindow));
+        kakao.maps.event.addListener(marker, 'mouseout', makeOutListener(infowindow));
+    }
+}
+// 인포윈도우를 표시하는 클로저를 만드는 함수입니다 
+function makeOverListener(map, marker, infowindow) {
+    return function() {
+        infowindow.open(map, marker);
+    };
+}
+
+// 인포윈도우를 닫는 클로저를 만드는 함수입니다 
+function makeOutListener(infowindow) {
+    return function() {
+        infowindow.close();
+    };
+}
+
+/* 아래와 같이도 할 수 있습니다 */
+/*
+for (var i = 0; i < positions.length; i ++) {
+    // 마커를 생성합니다
+    var marker = new kakao.maps.Marker({
+        map: map, // 마커를 표시할 지도
+        position: positions[i].latlng // 마커의 위치
+    });
+
+    // 마커에 표시할 인포윈도우를 생성합니다 
+    var infowindow = new kakao.maps.InfoWindow({
+        content: positions[i].content // 인포윈도우에 표시할 내용
+    });
+
+    // 마커에 이벤트를 등록하는 함수 만들고 즉시 호출하여 클로저를 만듭니다
+    // 클로저를 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
+    (function(marker, infowindow) {
+        // 마커에 mouseover 이벤트를 등록하고 마우스 오버 시 인포윈도우를 표시합니다 
+        kakao.maps.event.addListener(marker, 'mouseover', function() {
+            infowindow.open(map, marker);
+        });
+
+        // 마커에 mouseout 이벤트를 등록하고 마우스 아웃 시 인포윈도우를 닫습니다
+        kakao.maps.event.addListener(marker, 'mouseout', function() {
+            infowindow.close();
+        });
+    })(marker, infowindow);
+}
+*/
+</script>
+</body>
+</html>
