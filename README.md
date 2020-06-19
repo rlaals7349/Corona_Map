@@ -10,4 +10,6 @@
 
 ## 실시간 약국별 마스크 판매 및 재고현황 파악
 
+- 공공데이터 API 활용
+
 ![Pharmacy](https://user-images.githubusercontent.com/58922804/84990029-834c4c80-b17f-11ea-9264-71b954cf5f91.png)
