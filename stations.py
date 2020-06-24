@@ -1,6 +1,6 @@
-from collections import namedtuple
+# -*- coding: utf-8 -*-
+from collections import namedtuple, deque
 import os 
-import deque
 
 # 1- station 클래스를 만듭시다.
 class Station:
@@ -16,11 +16,12 @@ class Station:
 
 # 2- 파일 읽기
 
-# station 사전 만들기 - station 사전을 만드는 이유는 각각의 역 이름과 각 역에 담긴 정보들(Station 클래스의 인스턴스)을 key - value 값으로 입력하기 위함입니다.
+# station 사전 만들기 - station 사전을 만드는 이유는 각각의 역 이름과 
+# 각 역에 담긴 정보들(Station 클래스의 인스턴스)을 key - value 값으로 입력하기 위함입니다.
 stations = {}
 
 # station 파일을 읽어봅시다.
-in_file = open(os.path.split(os.path.realpath(__file__))+"/datas/busan_jiha.txt",encoding="utf-8")
+in_file = open(os.path.dirname(os.path.realpath(__file__))+"\\datas\\station_name.txt", encoding='UTF8')
 
 # add_connection 메소드를 활용하기 위해 이전 역과 현재 역으로 구분 시켜줄 필요가 있습니다.
 # 물론, 현재 이전역은 없는 상태이므로 None으로 지정해줍니다.
