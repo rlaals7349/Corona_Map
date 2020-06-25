@@ -50,23 +50,35 @@ def get_arrows(locations, color="#000000", size=6, n_arrows=3):
     return arrows
 
 def load_subway():
-    subway = pd.read_csv(os.path.split(os.path.realpath(__file__))[0]+"\\datas\\Busan_subway.csv")
+    try:
+        subway = pd.read_csv(os.path.split(os.path.realpath(__file__))[0]+"\\datas\\Busan_subway.csv")
+    except Exception as e:
+        print("error : ", e)
     return subway
 
 def load_busan_geojson():
     # 행정구 나누는 데이터 불러오기
-    with open(os.path.split(os.path.realpath(__file__))[0]+'\\datas\\Busan_gu.json',mode='rt',encoding='utf-8') as infile:
-        busan_geojson=json.loads(infile.read())
+    try:
+        with open(os.path.split(os.path.realpath(__file__))[0]+'\\datas\\Busan_gu.json',mode='rt',encoding='utf-8') as infile:
+            busan_geojson=json.loads(infile.read())
+    except Exception as e:
+        print("error : ", e)
     return busan_geojson
 
 def load_gu_info():
     # 구청 데이터 불러오기(확진자 비율, 명수 포함되어 있음)
-    gu_info=pd.read_csv(os.path.split(os.path.realpath(__file__))[0]+'\\datas\\Gucheong_info(20_03_06).csv')
+    try:
+        gu_info=pd.read_csv(os.path.split(os.path.realpath(__file__))[0]+'\\datas\\Gucheong_info(20_03_06).csv')
+    except Exception as e:
+        print("error : ", e)
     return gu_info
 
 def load_patient():
     # 확진자 데이터 불러오기
-    patient=pd.read_csv(os.path.split(os.path.realpath(__file__))[0]+'\\datas\\patient_info(20_03_06).csv')
+    try:
+        patient=pd.read_csv(os.path.split(os.path.realpath(__file__))[0]+'\\datas\\patient_info(20_03_06).csv')
+    except Exception as e:
+        print("error : ", e)
     return patient
 
 # 지하철 좌표 구하기
